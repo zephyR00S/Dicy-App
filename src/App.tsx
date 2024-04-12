@@ -1,6 +1,5 @@
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {StyleSheet, Text, View, ImageSourcePropType, Image} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, Pressable, Animated } from 'react-native';
 import dice1 from '../assets/One.png';
 import dice2 from '../assets/Two.png';
 import dice3 from '../assets/Three.png';
@@ -8,22 +7,101 @@ import dice4 from '../assets/Four.png';
 import dice5 from '../assets/Five.png';
 import dice6 from '../assets/Six.png';
 
-type DiceProps = PropsWithChildren<{
-  imageUrl: ImageSourcePropType
-}>
+const diceImages = [dice1, dice2, dice3, dice4, dice5, dice6];
 
-const Dice = ({imageUrl}: DiceProps ):JSX.Element => {
- return(
-  <View>
-    <Image style = {styles.diceImage} source={imageUrl}></Image>
-  </View>
- )
+function App(): JSX.Element {
+  const [diceIndex, setDiceIndex] = useState<number>(0);
+  const [buttonColor] = useState(new Animated.Value(0));
+  const [diceRotation] = useState(new Animated.Value(0));
+
+  useEffect(() => {
+    const buttonAnimation = Animated.loop(
+      Animated.timing(buttonColor, {
+        toValue: 1000,
+        duration: 5000,
+        useNativeDriver: false,
+      })
+    );
+    buttonAnimation.start();
+
+    return () => buttonAnimation.stop();
+  }, []);
+
+  const rollDice = () => {
+    const randomNumber = Math.floor(Math.random() * 6);
+    setDiceIndex(randomNumber);
+    Animated.timing(diceRotation, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start(() => {
+      diceRotation.setValue(0);
+    });
+  };
+
+  const buttonBackgroundColor = buttonColor.interpolate({
+    inputRange: [0,250,500,750, 1000],
+    outputRange: ['#01000a', '#080363','#08a103','#fbff03', '#a80204'],
+  });
+
+  const diceRotationStyle = {
+    transform: [
+      {
+        rotate: diceRotation.interpolate({
+          inputRange: [0, 1],
+          outputRange: ['0deg', '360deg'],
+        }),
+      },
+    ],
+  };
+
+  return (
+    <View style={styles.container}>
+      <Animated.Image
+        style={[styles.diceImage, diceRotationStyle]}
+        source={diceImages[diceIndex]}
+      />
+      <Pressable onPress={rollDice}>
+        <Animated.View style={[styles.rollDiceButton, { backgroundColor: buttonBackgroundColor }]}>
+          <Text style={styles.rollDiceBtnText}>Press Me</Text>
+        </Animated.View>
+      </Pressable>
+    </View>
+  );
 }
 
-function App(): React.JSX.Element {
-  return <View></View>;
-}
-
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#e9fc53',
+  },
+  diceImage: {
+    width: 200,
+    height: 200,
+  },
+  rollDiceButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 40,
+    borderWidth: 2,
+    borderRadius: 8,
+    borderColor: '#06051c',
+    shadowColor: '#06051c',
+    shadowOffset: {
+      width: 1,
+      height: 2,
+    },
+    shadowOpacity: 0.999,
+    shadowRadius: 3.84,
+    elevation: 4,
+  },
+  rollDiceBtnText: {
+    fontSize: 16,
+    color: 'white',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+});
 
 export default App;
