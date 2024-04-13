@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, Pressable, Animated } from 'react-native';
+import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import dice1 from '../assets/One.png';
 import dice2 from '../assets/Two.png';
 import dice3 from '../assets/Three.png';
@@ -8,6 +9,11 @@ import dice5 from '../assets/Five.png';
 import dice6 from '../assets/Six.png';
 
 const diceImages = [dice1, dice2, dice3, dice4, dice5, dice6];
+
+const options = {
+  enableVibrateFallback: true,
+  ignoreAndroidSystemSettings: false,
+};
 
 function App(): JSX.Element {
   const [diceIndex, setDiceIndex] = useState<number>(0);
@@ -37,6 +43,7 @@ function App(): JSX.Element {
     }).start(() => {
       diceRotation.setValue(0);
     });
+    ReactNativeHapticFeedback.trigger("impactLight", options);
   };
 
   const buttonBackgroundColor = buttonColor.interpolate({
@@ -66,7 +73,9 @@ function App(): JSX.Element {
           <Text style={styles.rollDiceBtnText}>Press Me</Text>
         </Animated.View>
       </Pressable>
+    
     </View>
+
   );
 }
 
@@ -75,11 +84,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#e9fc53',
+    backgroundColor: '#010e1c',
   },
   diceImage: {
     width: 200,
     height: 200,
+    marginBottom: 50
+    
   },
   rollDiceButton: {
     paddingVertical: 10,
@@ -87,14 +98,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 8,
     borderColor: '#06051c',
-    shadowColor: '#06051c',
+    shadowColor: '#bee4f7',
     shadowOffset: {
-      width: 1,
-      height: 2,
+      width: 5,
+      height: 5,
     },
     shadowOpacity: 0.999,
-    shadowRadius: 3.84,
-    elevation: 4,
+    shadowRadius: 10,
+    elevation: 2,
   },
   rollDiceBtnText: {
     fontSize: 16,
